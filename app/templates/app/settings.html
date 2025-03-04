@@ -1,0 +1,330 @@
+{% extends 'app/layout.html' %}
+{% load static %}
+
+{% block head %}
+<!-- Add Font Awesome CSS -->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+{% endblock %}
+
+{% block content %}
+<h1>Settings</h1>
+<ul class="nav nav-tabs" id="settingsTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="lab-settings-tab" data-bs-toggle="tab" href="#lab-settings" role="tab" aria-controls="lab-settings" aria-selected="true">Lab Settings</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="profile-settings-tab" data-bs-toggle="tab" href="#profile-settings" role="tab" aria-controls="profile-settings" aria-selected="false">Profile Settings</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="subscription-settings-tab" data-bs-toggle="tab" href="#subscription-settings" role="tab" aria-controls="subscription-settings" aria-selected="false">Subscription Settings</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="general-settings-tab" data-bs-toggle="tab" href="#general-settings" role="tab" aria-controls="general-settings" aria-selected="false">General Settings</a>
+    </li>
+</ul>
+
+<div class="tab-content" id="settingsTabContent">
+    <!-- Lab Settings -->
+    <div class="tab-pane fade show active" id="lab-settings" role="tabpanel" aria-labelledby="lab-settings-tab">
+        <form>
+            <div class="form-group">
+                <label for="lab-name">Lab Name:</label>
+                <input type="text" class="form-control" id="lab-name" placeholder="Enter Lab Name">
+            </div>
+            <div class="form-group">
+                <label for="pin-code">PIN Code:</label>
+                <input type="text" class="form-control" id="pin-code" placeholder="Enter PIN Code">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter Email">
+            </div>
+            <div class="form-group">
+                <label for="address-1">Address 1:</label>
+                <input type="text" class="form-control" id="address-1" placeholder="Enter Address 1">
+            </div>
+            <div class="form-group">
+                <label for="address-2">Address 2:</label>
+                <input type="text" class="form-control" id="address-2" placeholder="Enter Address 2">
+            </div>
+            <div class="form-group">
+                <label for="city">City:</label>
+                <input type="text" class="form-control" id="city" placeholder="Enter City">
+            </div>
+            <div class="form-group">
+                <label for="country">Country:</label>
+                <input type="text" class="form-control" id="country" placeholder="Enter Country">
+            </div>
+            <div class="form-group">
+                <label for="state">State:</label>
+                <select class="form-control" id="state">
+                    <option>Select State</option>
+                    <!-- Add options dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="zip-code">Zip Code:</label>
+                <input type="text" class="form-control" id="zip-code" placeholder="Enter Zip Code">
+            </div>
+            <div class="form-group">
+                <label for="first-name">First Name:</label>
+                <input type="text" class="form-control" id="first-name" placeholder="Enter First Name">
+            </div>
+            <div class="form-group">
+                <label for="last-name">Last Name:</label>
+                <input type="text" class="form-control" id="last-name" placeholder="Enter Last Name">
+            </div>
+            <div class="form-group">
+                <label for="office-phone">Office Phone:</label>
+                <input type="text" class="form-control" id="office-phone" placeholder="Enter Office Phone">
+            </div>
+            <div class="form-group">
+                <label for="fax">Fax:</label>
+                <input type="text" class="form-control" id="fax" placeholder="Enter Fax">
+            </div>
+            <div class="form-group">
+                <label for="cell-phone">Cell Phone:</label>
+                <input type="text" class="form-control" id="cell-phone" placeholder="Enter Cell Phone">
+            </div>
+            <div class="form-group text-right mt-3">
+                <button type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary">Edit</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Profile Settings -->
+    <div class="tab-pane fade" id="profile-settings" role="tabpanel" aria-labelledby="profile-settings-tab">
+        <div class="container rounded bg-white mt-5 mb-5">
+            <div class="row">
+                <div class="col-md-3 border-right">
+                    <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                        <!-- Profile Image -->
+                        <img class="rounded-circle mt-5" width="150px" src="{% static 'images/profile.jpg' %}" alt="Profile Picture" id="profile-picture">
+
+                        <!-- Link to Edit/Change Image -->
+                        <a href="#" class="mt-2 text-primary" onclick="document.getElementById('profile-picture-input').click()">Edit Picture</a>
+
+                        <!-- Hidden File Input -->
+                        <input type="file" id="profile-picture-input" style="display: none;" onchange="handleImageUpload(event)">
+
+                        <!-- User Details, here will display who is logged in to portal, with the profile settings. -->
+                        <span class="font-weight-bold">{{ user.username }}</span>
+                        <span class="text-black-50">{{ user.email }}</span>
+                    </div>
+                </div>
+                <div class="col-md-5 border-right">
+                    <div class="p-3 py-5">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="text-right">Profile Settings</h4>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label class="labels">Name</label>
+                                <input type="text" class="form-control" placeholder="first name" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="labels">Surname</label>
+                                <input type="text" class="form-control" value="" placeholder="surname">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label class="labels">Mobile Number</label>
+                                <input type="text" class="form-control" placeholder="enter phone number" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Address Line 1</label>
+                                <input type="text" class="form-control" placeholder="enter address line 1" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Address Line 2</label>
+                                <input type="text" class="form-control" placeholder="enter address line 2" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Postcode</label>
+                                <input type="text" class="form-control" placeholder="enter postcode" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">State</label>
+                                <input type="text" class="form-control" placeholder="enter state" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Area</label>
+                                <input type="text" class="form-control" placeholder="enter area" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Email ID</label>
+                                <input type="text" class="form-control" placeholder="enter email id" value="">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="labels">Education</label>
+                                <input type="text" class="form-control" placeholder="education" value="">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label class="labels">Country</label>
+                                <input type="text" class="form-control" placeholder="country" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="labels">State/Region</label>
+                                <input type="text" class="form-control" value="" placeholder="state">
+                            </div>
+                        </div>
+                        <div class="mt-5 text-center">
+                            <button class="btn btn-primary profile-button" type="button">Save Profile</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 py-5">
+                        <div class="d-flex justify-content-between align-items-center experience">
+                            <span>Edit Experience</span>
+                            <span class="border px-3 p-1 add-experience"><i class="fa fa-plus"></i>&nbsp;Experience</span>
+                        </div>
+                        <br>
+                        <div class="col-md-12">
+                            <label class="labels">Experience in Designing</label>
+                            <input type="text" class="form-control" placeholder="experience" value="">
+                        </div>
+                        <br>
+                        <div class="col-md-12">
+                            <label class="labels">Additional Details</label>
+                            <input type="text" class="form-control" placeholder="additional details" value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Settings -->
+    <div class="tab-pane fade" id="subscription-settings" role="tabpanel" aria-labelledby="subscription-settings-tab">
+        <div class="pricing8 py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 text-center">
+                        <h3 class="mb-3">Pricing to make your Work Effective</h3>
+                        <h6 class="subtitle font-weight-normal">We offer 100% satisfaction and Money back Guarantee</h6>
+                    </div>
+                </div>
+                <!-- row  -->
+                <div class="row mt-4">
+                    <!-- column  -->
+                    <div class="col-md-4 ml-auto pricing-box align-self-center">
+                        <div class="card mb-4">
+                            <div class="card-body p-4 text-center">
+                                <h5 class="font-weight-normal">Regular Plan</h5>
+                                <sup>$</sup><span class="text-dark display-5">35</span>
+                                <h6 class="font-weight-light font-14">Per Month</h6>
+                                <p class="mt-4">
+                                    Case log in, 2 users per lab, unlemitted case log in
+                                </p>
+                            </div>
+                            <a class="btn btn-info-gradiant p-3 btn-block border-5 text-black-50" href="#">CHOOSE PLAN </a>
+                        </div>
+                    </div>
+                    <!-- column  -->
+                    <!-- column  -->
+                    <div class="col-md-4 ml-auto pricing-box align-self-center">
+                        <div class="card mb-4">
+                            <div class="card-body p-4 text-center">
+                                <h5 class="font-weight-normal">Master Plan</h5>
+                                <sup>$</sup><span class="text-dark display-5">45</span>
+                                <h6 class="font-weight-light font-14">Per Month</h6>
+                                <p class="mt-4">
+                                    Everything in Regular Plan plus Outsource platform, 5 users per account.
+                                </p>
+                            </div>
+                            <a class="btn btn-danger-gradiant p-3 btn-block border-5 text-black-50" href="#">CHOOSE PLAN </a>
+                        </div>
+                    </div>
+                    <!-- column  -->
+                    <!-- column  -->
+                    <div class="col-md-4 ml-auto pricing-box align-self-center">
+                        <div class="card mb-4">
+                            <div class="card-body p-4 text-center">
+                                <h5 class="font-weight-normal">Premium Plan</h5>
+                                <sup>$</sup><span class="text-dark display-5">450</span>
+                                <h6 class="font-weight-light font-14">Per Month</h6>
+                                <p class="mt-4">
+                                    Everything in Master Plan Pluse, stl editor, AI assistant for Smart Log in, Full Outsource Dash
+                                    to manage outsourced cases and designers, Master Invoice, Master Shipping, iTero and Medit Integration,
+                                    Automated WorkFlow LinksHub State of the Art. up to 15 accounts included, Task assignment, Pay Per Task,
+                                    Pay per Case for Technicians.
+
+                                </p>
+                            </div>
+                            <a class="btn btn-info-gradiant p-3 btn-block border-5 text-black-50" href="#">CHOOSE PLAN </a>
+                        </div>
+                    </div>
+                    <!-- column  -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Settings -->
+    <div class="tab-pane fade" id="general-settings" role="tabpanel" aria-labelledby="general-settings-tab">
+        <form>
+            <div class="form-group">
+                <label for="date-format">Date Format:</label>
+                <select class="form-control" id="date-format">
+                    <option value="MM/dd/yyyy">MM/dd/yyyy</option>
+                    <option value="dd/MM/yyyy">dd/MM/yyyy</option>
+                    <option value="yyyy-MM-dd">yyyy-MM-dd</option>
+                </select>
+                <small class="form-text text-muted">Display Example: 01/16/2025</small>
+            </div>
+            <div class="form-group">
+                <label for="customer-view">Customer View:</label>
+                <select class="form-control" id="customer-view">
+                    <option value="view">View</option>
+                    <option value="edit">Edit</option>
+                </select>
+                <small class="form-text text-muted">Set the Customer display type.</small>
+            </div>
+            <div class="form-group">
+                <label for="time-zone">Time Zone:</label>
+                <select class="form-control" id="time-zone">
+                    <option value="PST">Pacific Time (GMT -8)</option>
+                    <option value="MST">Mountain Time (GMT -7)</option>
+                    <option value="CST">Central Time (GMT -6)</option>
+                    <option value="EST">Eastern Time (GMT -5)</option>
+                </select>
+                <small class="form-text text-muted">Your local time should now display: 01/16/2025 08:38 PM</small>
+            </div>
+            <div class="form-group">
+                <label for="statement-lines">Statement Lines #:</label>
+                <input type="number" class="form-control" id="statement-lines" value="25">
+                <small class="form-text text-muted">Set the number of lines your printer supports per Statement page.</small>
+            </div>
+            <div class="form-group">
+                <label for="currency">Currency:</label>
+                <select class="form-control" id="currency">
+                    <option value="$">$</option>
+                </select>
+                <small class="form-text text-muted">Set the currency symbol.</small>
+            </div>
+            <div class="form-group text-right mt-3">
+                <button type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-secondary">Edit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function handleImageUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('profile-picture').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+{% endblock %}

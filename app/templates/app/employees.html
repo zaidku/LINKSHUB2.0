@@ -1,0 +1,12 @@
+{% extends "app/layout.html" %}
+
+{% block title %}Employees{% endblock %}
+
+{% block content %}
+<h2>Employees of {{ current_lab.name }}</h2>
+<ul>
+    {% for employee in current_lab.employees %}
+    <li>{{ employee.name }} - {{ employee.role }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

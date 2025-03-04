@@ -1,0 +1,26 @@
+<!-- templates/upload_model.html -->
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload 3D Model</title>
+</head>
+<h1>Upload Model</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload</button>
+</form>
+<ul>
+    {% for model in models %}
+    <li><a href="{% url 'upload_model' model.id %}">{{ model.name }}</a></li>
+    {% endfor %}
+</html>
+
+
+{% endblock %}

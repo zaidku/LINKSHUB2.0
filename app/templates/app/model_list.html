@@ -1,0 +1,16 @@
+<!-- templates/model_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Models</title>
+</head>
+<body>
+    <h1>Model List</h1>
+<ul>
+    {% for model in models %}
+    <li><a href="{% url 'view_list' model.id %}">{{ model.name }}</a></li>
+    {% endfor %}
+</ul>
+</body>
+</html>

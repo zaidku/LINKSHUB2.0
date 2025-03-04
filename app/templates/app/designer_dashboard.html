@@ -1,0 +1,451 @@
+{% extends 'app/layout.html' %}
+
+{% block title %}Designer Dashboard{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Designer Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom Styles */
+
+        /* Add to Invoice Button */
+        #addToInvoice {
+            background-color: #28a745 !important; /* Green background */
+            color: white !important;
+            padding: 8px 15px !important; /* Padding */
+            border: none !important; /* No border */
+            border-radius: 5px !important; /* Rounded corners */
+            cursor: pointer !important; /* Pointer cursor */
+            font-size: 14px !important; /* Font size */
+            transition: all 0.3s !important; /* Smooth transition */
+        }
+
+            #addToInvoice:hover {
+                background-color: #218838 !important; /* Darker green on hover */
+            }
+
+        /* General Button Styles */
+        .btn-custom,
+        .btn-primary {
+            background-color: #007bff !important; /* Blue background */
+            color: white !important; /* White text */
+            padding: 8px 15px !important; /* Padding */
+            border: none !important; /* No border */
+            border-radius: 5px !important; /* Rounded corners */
+            cursor: pointer !important; /* Pointer cursor */
+            font-size: 14px !important; /* Font size */
+            transition: all 0.3s !important; /* Smooth transition */
+        }
+
+            .btn-custom:hover,
+            .btn-primary:hover {
+                background-color: #0056b3 !important; /* Darker blue on hover */
+            }
+
+        .btn-secondary {
+            background-color: #6c757d !important; /* Gray background */
+            color: white !important; /* White text */
+        }
+
+            .btn-secondary:hover {
+                background-color: #5a6268 !important; /* Darker gray on hover */
+            }
+
+        .btn-danger {
+            background-color: #dc3545 !important; /* Red background */
+            color: white !important; /* White text */
+        }
+
+            .btn-danger:hover {
+                background-color: #c82333 !important; /* Darker red on hover */
+            }
+
+        /* Other Styles */
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .dashboard-header {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+                font-weight: bold;
+                color: #333;
+            }
+
+        .nav-tabs .nav-link {
+            color: #333;
+            font-weight: bold;
+            border: 1px solid transparent;
+            border-radius: 0;
+        }
+
+            .nav-tabs .nav-link.active {
+                background-color: #fff;
+                border-color: #dee2e6 #dee2e6 #fff;
+                color: #333;
+            }
+
+            .nav-tabs .nav-link:hover {
+                border-color: #dee2e6 #dee2e6 #ddd;
+            }
+
+        .table th {
+            background-color: #f8f9fa;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table td {
+            border-top: 1px solid #dee2e6;
+        }
+
+        .case-details {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+            .case-details h4 {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+                color: #333;
+            }
+
+            .case-details p {
+                margin-bottom: 10px;
+            }
+
+            .case-details .btn {
+                margin-right: 10px;
+            }
+
+        .invoice-form {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+            .invoice-form label {
+                font-weight: bold;
+            }
+
+        .printable-invoice {
+            display: none;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .printable-invoice, .printable-invoice * {
+                visibility: visible;
+            }
+
+            .printable-invoice {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>Designer Dashboard</h1>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" id="designerTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="my-cases-tab" data-bs-toggle="tab" data-bs-target="#my-cases" type="button" role="tab">My Cases</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pending-review-tab" data-bs-toggle="tab" data-bs-target="#pending-review" type="button" role="tab">Pending Review</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="completed-cases-tab" data-bs-toggle="tab" data-bs-target="#completed-cases" type="button" role="tab">Completed Cases</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="invoice-tab" data-bs-toggle="tab" data-bs-target="#invoice" type="button" role="tab">Invoice</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Payments</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="designerTabsContent">
+            <!-- My Cases Tab -->
+            <div class="tab-pane fade show active" id="my-cases" role="tabpanel">
+                <div id="my-cases-list"></div>
+            </div>
+
+            <!-- Pending Review Tab -->
+            <div class="tab-pane fade" id="pending-review" role="tabpanel">
+                <div id="pending-review-list"></div>
+            </div>
+
+            <!-- Completed Cases Tab -->
+            <div class="tab-pane fade" id="completed-cases" role="tabpanel">
+                <div id="completed-cases-list"></div>
+                <button class="btn btn-custom" id="addToInvoice">Add to Invoice</button>
+            </div>
+
+            <!-- Invoice Tab -->
+            <div class="tab-pane fade" id="invoice" role="tabpanel">
+                <div class="invoice-form">
+                    <h4>Invoice</h4>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Case ID</th>
+                                <th>Clinic</th>
+                                <th>Amount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceItems">
+                            <!-- Invoice items will be dynamically populated -->
+                        </tbody>
+                    </table>
+                    <p><strong>Total Amount:</strong> $<span id="totalAmount">0</span></p>
+                    <button class="btn btn-custom" id="sendInvoice">Send Invoice</button>
+                    <button class="btn btn-custom" onclick="window.print()">Print Invoice</button>
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div class="tab-pane fade" id="payments" role="tabpanel">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-list">
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simulated Data (Replace with API calls in a real application)
+        const casesData = [
+            {
+                id: 12345,
+                clinic: "Smile Dental",
+                toothNumber: "14, 15",
+                rxInstructions: "Full contour zirconia crown.",
+                doctorNotes: "Ensure proper occlusion.",
+                status: "Assigned",
+                attachments: ["scan1.stl", "photo1.jpg"],
+            },
+            {
+                id: 67890,
+                clinic: "Bright Dental",
+                toothNumber: "21",
+                rxInstructions: "Veneer, shade A2.",
+                doctorNotes: "Match adjacent teeth.",
+                status: "Assigned",
+                attachments: ["scan2.stl", "photo2.jpg"],
+            },
+        ];
+
+        const pendingReviewData = [
+            {
+                id: 12345,
+                clinic: "Smile Dental",
+                submittedOn: "2023-10-01",
+                status: "Submitted for Review",
+            },
+        ];
+
+        const completedCasesData = [
+            {
+                id: 54321,
+                clinic: "Smile Dental",
+                status: "Approved",
+                approvedOn: "2023-09-25",
+                paymentStatus: "Paid",
+                amount: 50,
+            },
+            {
+                id: 98765,
+                clinic: "Bright Dental",
+                status: "Approved",
+                approvedOn: "2023-09-30",
+                paymentStatus: "Unpaid",
+                amount: 75,
+            },
+        ];
+
+        const paymentsData = [
+            {
+                id: 12345,
+                amount: "$50",
+                paymentStatus: "Paid",
+                paymentDate: "2023-09-30",
+            },
+            {
+                id: 67890,
+                amount: "$75",
+                paymentStatus: "Pending",
+                paymentDate: "-",
+            },
+        ];
+
+        // Function to render cases
+        function renderCases(data, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = data
+                .map(
+                    (caseItem) => `
+                        <div class="case-details">
+                          <h4>Case ID: ${caseItem.id}</h4>
+                          <p><strong>Clinic Name:</strong> ${caseItem.clinic}</p>
+                          ${caseItem.toothNumber ? `<p><strong>Tooth Number:</strong> ${caseItem.toothNumber}</p>` : ""}
+                          ${caseItem.rxInstructions ? `<p><strong>RX Instructions:</strong> ${caseItem.rxInstructions}</p>` : ""}
+                          ${caseItem.doctorNotes ? `<p><strong>Doctor’s Notes:</strong> ${caseItem.doctorNotes}</p>` : ""}
+                          ${caseItem.attachments ? `<button class="btn btn-custom">Download Attachments</button>` : ""}
+                          ${caseItem.status === "Assigned" ? `<button class="btn btn-custom">Submit for Review</button>` : ""}
+                          ${caseItem.status === "Submitted for Review" ? `<button class="btn btn-custom">View Feedback</button>` : ""}
+                          ${caseItem.status === "Approved" ? `<input type="checkbox" class="form-check-input" value="${caseItem.id}" data-amount="${caseItem.amount}" data-clinic="${caseItem.clinic}">` : ""}
+                        </div>
+                      `
+                )
+                .join("");
+        }
+
+        // Function to render payments
+        function renderPayments(data, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = data
+                .map(
+                    (payment) => `
+                        <tr>
+                          <td>${payment.id}</td>
+                          <td>${payment.amount}</td>
+                          <td>${payment.paymentStatus}</td>
+                          <td>${payment.paymentDate}</td>
+                        </tr>
+                      `
+                )
+                .join("");
+        }
+
+        // Add cases to invoice
+        document.getElementById("addToInvoice").addEventListener("click", () => {
+            const selectedCases = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map((checkbox) => ({
+                    id: checkbox.value,
+                    clinic: checkbox.dataset.clinic,
+                    amount: parseFloat(checkbox.dataset.amount),
+                }));
+
+            if (selectedCases.length === 0) {
+                alert("Please select at least one case to add to the invoice.");
+                return;
+            }
+
+            const invoiceItems = document.getElementById("invoiceItems");
+            invoiceItems.innerHTML = selectedCases
+                .map(
+                    (caseItem) => `
+                        <tr>
+                          <td>${caseItem.id}</td>
+                          <td>${caseItem.clinic}</td>
+                          <td>$${caseItem.amount}</td>
+                          <td><button class="btn btn-sm btn-danger" onclick="removeFromInvoice(${caseItem.id})">Remove</button></td>
+                        </tr>
+                      `
+                )
+                .join("");
+
+            const totalAmount = selectedCases.reduce((sum, caseItem) => sum + caseItem.amount, 0);
+            document.getElementById("totalAmount").textContent = totalAmount;
+        });
+
+        // Remove case from invoice
+        window.removeFromInvoice = (caseId) => {
+            const row = document.querySelector(`#invoiceItems tr[data-case-id="${caseId}"]`);
+            if (row) row.remove();
+            updateTotalAmount();
+        };
+
+        // Update total amount
+        function updateTotalAmount() {
+            const amounts = Array.from(document.querySelectorAll("#invoiceItems td:nth-child(3)"))
+                .map((td) => parseFloat(td.textContent.replace("$", "")));
+            const totalAmount = amounts.reduce((sum, amount) => sum + amount, 0);
+            document.getElementById("totalAmount").textContent = totalAmount;
+        }
+
+        // Send invoice
+        document.getElementById("sendInvoice").addEventListener("click", () => {
+            const invoiceItems = Array.from(document.querySelectorAll("#invoiceItems tr"))
+                .map((row) => ({
+                    id: row.cells[0].textContent,
+                    clinic: row.cells[1].textContent,
+                    amount: parseFloat(row.cells[2].textContent.replace("$", "")),
+                }));
+
+            if (invoiceItems.length === 0) {
+                alert("Please add at least one case to the invoice.");
+                return;
+            }
+
+            const totalAmount = invoiceItems.reduce((sum, caseItem) => sum + caseItem.amount, 0);
+            alert(`Invoice sent to lab for ${invoiceItems.length} cases.\nTotal Amount: $${totalAmount}`);
+
+            // Clear the invoice
+            document.getElementById("invoiceItems").innerHTML = "";
+            document.getElementById("totalAmount").textContent = "0";
+        });
+
+        // Render data on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCases(casesData, "my-cases-list");
+            renderCases(pendingReviewData, "pending-review-list");
+            renderCases(completedCasesData, "completed-cases-list");
+            renderPayments(paymentsData, "payments-list");
+        });
+    </script>
+</body>
+</html>
+
+{% endblock %}

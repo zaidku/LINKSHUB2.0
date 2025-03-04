@@ -1,0 +1,10 @@
+{% extends "app/layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Welcome, {{ user.name }}!</h2>
+<p>Lab: {{ current_lab.name }}</p>
+<p>Pending Cases: {{ current_lab.pending_cases_count }}</p>
+<p>Upcoming Appointments: {{ current_lab.upcoming_appointments }}</p>
+{% endblock %}

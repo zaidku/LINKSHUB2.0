@@ -1,0 +1,286 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Accounts Management</h2>
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" id="accountsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="add-account-tab" data-bs-toggle="tab" data-bs-target="#add-account" type="button" role="tab">Add New Account</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="browse-customers-tab" data-bs-toggle="tab" data-bs-target="#browse-customers" type="button" role="tab">Browse Customers</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="active-accounts-tab" data-bs-toggle="tab" data-bs-target="#active-accounts" type="button" role="tab">Active Accounts</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="deactivated-accounts-tab" data-bs-toggle="tab" data-bs-target="#deactivated-accounts" type="button" role="tab">Deactivated Accounts</button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content mt-4">
+        <!-- Add New Account Tab -->
+        <div class="tab-pane fade show active" id="add-account" role="tabpanel">
+            <h3>Add New Account</h3>
+            <form>
+                <div class="form-section">
+                    <h4>Customer Details</h4>
+                    <div class="row g-3">
+                        <!-- Left Column -->
+                        <div class="col-md-6">
+                            <label for="customerId" class="form-label">Customer ID</label>
+                            <input type="text" class="form-control" id="customerId" placeholder="Enter customer ID">
+
+                            <label for="officePhone" class="form-label mt-3">Office Phone</label>
+                            <input type="tel" class="form-control" id="officePhone" placeholder="Enter office phone">
+
+                            <label for="address1" class="form-label mt-3">Address 1</label>
+                            <input type="text" class="form-control" id="address1" placeholder="Enter primary address">
+
+                            <label for="city" class="form-label mt-3">City</label>
+                            <input type="text" class="form-control" id="city" placeholder="Enter city">
+
+                            <label for="clinicName" class="form-label mt-3">Clinic Name</label>
+                            <input type="text" class="form-control" id="clinicName" placeholder="Enter clinic name">
+
+                            <label for="specialty" class="form-label mt-3">Specialty</label>
+                            <select class="form-select" id="specialty">
+                                <option value="">Select Specialty</option>
+                                <option value="Dermatology">Dermatology</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <!-- Add more specialties -->
+                            </select>
+
+                            <label for="notes" class="form-label mt-3">Brief Personal Notes</label>
+                            <textarea class="form-control" id="notes" rows="3" placeholder="Enter any personal notes"></textarea>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="firstName" placeholder="Enter first name">
+
+                            <label for="lastName" class="form-label mt-3">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" placeholder="Enter last name">
+
+                            <label for="cellPhone" class="form-label mt-3">Cell Phone</label>
+                            <input type="tel" class="form-control" id="cellPhone" placeholder="Enter cell phone">
+
+                            <label for="email" class="form-label mt-3">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="Enter email">
+
+                            <label for="address2" class="form-label mt-3">Address 2</label>
+                            <input type="text" class="form-control" id="address2" placeholder="Enter secondary address">
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label for="state" class="form-label">State</label>
+                                    <select class="form-select" id="state">
+                                        <option value="">Select State</option>
+                                        <option value="CA">California</option>
+                                        <option value="NY">New York</option>
+                                        <!-- Add more states -->
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="zipCode" class="form-label">Zip Code</label>
+                                    <input type="text" class="form-control" id="zipCode" placeholder="Enter zip code">
+                                </div>
+                            </div>
+
+                            <label for="clinicType" class="form-label mt-3">Clinic Type</label>
+                            <select class="form-select" id="clinicType">
+                                <option value="">Select clinic type</option>
+                                <option value="general">General Dentistry</option>
+                                <option value="orthodontics">Orthodontics</option>
+                                <!-- Add more clinic types -->
+                            </select>
+
+                            <label for="taxRate" class="form-label mt-3">Tax Rate (%)</label>
+                            <input type="number" class="form-control" id="taxRate" placeholder="0.00%">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credit Card on File Section -->
+                <div class="padding mt-4">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <strong>Credit Card on File</strong>
+                                    <small>Enter the doctor's card details</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label for="name">Name on Card</label>
+                                                <input class="form-control" id="name" type="text" placeholder="Enter the name on the card">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label for="ccnumber">Credit Card Number</label>
+                                                <div class="input-group">
+                                                    <input class="form-control" type="text" placeholder="0000 0000 0000 0000" autocomplete="off">
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">
+                                                            <i class="mdi mdi-credit-card"></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-sm-4">
+                                            <label for="ccmonth">Expiration Month</label>
+                                            <select class="form-control" id="ccmonth">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                                <option>8</option>
+                                                <option>9</option>
+                                                <option>10</option>
+                                                <option>11</option>
+                                                <option>12</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-sm-4">
+                                            <label for="ccyear">Expiration Year</label>
+                                            <select class="form-control" id="ccyear">
+                                                <option>2023</option>
+                                                <option>2024</option>
+                                                <option>2025</option>
+                                                <option>2026</option>
+                                                <option>2027</option>
+                                                <option>2028</option>
+                                                <option>2029</option>
+                                                <option>2030</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="cvv">CVV/CVC</label>
+                                                <input class="form-control" id="cvv" type="text" placeholder="123">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-sm btn-success float-right" type="submit">
+                                        <i class="mdi mdi-gamepad-circle"></i> Save Card
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" type="reset">
+                                        <i class="mdi mdi-lock-reset"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Buttons -->
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Save Account</button>
+                    <button type="button" class="btn btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Browse Customers -->
+        <div class="tab-pane fade" id="browse-customers" role="tabpanel">
+            <h3>Browse Customers</h3>
+            <div class="row g-3 mb-3">
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option>Filter by...</option>
+                        <option>Customer ID</option>
+                        <option>First Name</option>
+                        <option>Last Name</option>
+                        <!-- Add more filters -->
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" placeholder="Search">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <!-- Add other columns -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="text-center">No results found</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Active Accounts -->
+        <div class="tab-pane fade" id="active-accounts" role="tabpanel">
+            <h3>Active Accounts</h3>
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="text-center">No active accounts found</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Deactivated Accounts -->
+        <div class="tab-pane fade" id="deactivated-accounts" role="tabpanel">
+            <h3>Deactivated Accounts</h3>
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Customer ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="5" class="text-center">No deactivated accounts found</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - LinksHub</title>
+    {% load static %}
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fb;
+        }
+
+            /* Dark Mode */
+            body.dark-mode {
+                background-color: #1a1a1a;
+                color: #ffffff;
+            }
+
+                body.dark-mode .sidebar {
+                    background-color: #111827;
+                }
+
+                body.dark-mode .top-bar {
+                    background-color: #1f2937;
+                    color: #ffffff;
+                }
+
+                body.dark-mode .widget {
+                    background-color: #374151;
+                    color: #ffffff;
+                }
+
+                body.dark-mode .search-bar input {
+                    background-color: #374151;
+                    color: #ffffff;
+                    border-color: #4b5563;
+                }
+
+                body.dark-mode .search-bar button {
+                    background-color: #4b5563;
+                    color: #ffffff;
+                }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #1f2937;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            z-index: 1030;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+            .sidebar .navbar-brand {
+                font-size: 1.5rem;
+                font-weight: 600;
+                padding: 15px 20px;
+                border-bottom: 1px solid #444;
+                color: #fff;
+                text-align: center;
+            }
+
+            .sidebar ul {
+                padding: 0;
+                list-style: none;
+                margin: 0;
+            }
+
+            .sidebar .nav-item {
+                margin: 5px 0;
+            }
+
+            .sidebar .nav-link {
+                display: flex;
+                align-items: center;
+                color: #cbd5e1;
+                padding: 10px 20px;
+                text-decoration: none;
+                font-size: 1rem;
+                font-weight: 500;
+                border-radius: 8px;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+                .sidebar .nav-link:hover,
+                .sidebar .nav-link.active {
+                    background-color: #374151;
+                    color: white;
+                }
+
+                .sidebar .nav-link i {
+                    font-size: 1.2rem;
+                    margin-right: 10px;
+                }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 20px;
+            background-color: #f5f7fb;
+        }
+
+        body.dark-mode .main-content {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .top-bar {
+            background-color: #fff;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .top-bar .notification-bell {
+                position: relative;
+                font-size: 1.2rem;
+                color: #007bff;
+                cursor: pointer;
+            }
+
+                .top-bar .notification-bell .notification-count {
+                    position: absolute;
+                    top: -5px;
+                    right: -10px;
+                    background-color: red;
+                    color: white;
+                    border-radius: 50%;
+                    font-size: 0.7rem;
+                    width: 18px;
+                    height: 18px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+        .search-bar {
+            width: 300px;
+            max-width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+            .search-bar input {
+                flex: 1;
+                padding: 8px;
+                border-radius: 5px 0 0 5px;
+                border: 1px solid #ccc;
+            }
+
+            .search-bar button {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 0 5px 5px 0;
+                cursor: pointer;
+            }
+
+        .dark-mode-toggle {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+            .dark-mode-toggle span {
+                margin-right: 10px;
+            }
+
+        /* Widgets */
+        .widget {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+            .widget h3 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .widget .value {
+                font-size: 1.8rem;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .widget .description {
+                font-size: 0.9rem;
+                color: #666;
+            }
+
+        body.dark-mode .widget .description {
+            color: #cbd5e1;
+        }
+
+        /* Chart Area */
+        .chart-container {
+            margin-top: 20px;
+        }
+
+            .chart-container canvas {
+                width: 100%;
+                max-width: 600px;
+                margin: auto;
+            }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+
+            .top-bar {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .search-bar {
+                margin-top: 10px;
+            }
+
+            .widget {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="navbar-brand">LinksHub</div>
+        <ul>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'cases' or request.resolver_match.url_name == 'create_case' %}active{% endif %}" href="{% url 'cases' %}">
+                    <i class="fas fa-briefcase"></i> Cases
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'calls' %}active{% endif %}" href="{% url 'calls' %}">
+                    <i class="fas fa-phone"></i> Calls
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'accounting' %}active{% endif %}" href="{% url 'accounting' %}">
+                    <i class="fas fa-chart-line"></i> Accounting
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'sales' %}active{% endif %}" href="{% url 'sales' %}">
+                    <i class="fas fa-shopping-cart"></i> Sales
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'lab_products' %}active{% endif %}" href="{% url 'lab_product' %}">
+                    <i class="fas fa-flask"></i> Lab Product
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'outsource' %}active{% endif %}" href="{% url 'outsource' %}">
+                    <i class="fas fa-external-link-alt"></i> Outsource
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'designer_dashboard' %}active{% endif %}" href="{% url 'designer_dashboard' %}">
+                    <i class="fas fa-palette"></i> Designer Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}" href="{% url 'settings' %}">
+                    <i class="fas fa-cogs"></i> Settings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'accounts' %}active{% endif %}" href="{% url 'accounts' %}">
+                    <i class="fas fa-users"></i> Accounts
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <!-- Notification Bell -->
+            <div class="notification-bell">
+                <i class="fas fa-bell"></i>
+                <div class="notification-count">3</div>
+            </div>
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" placeholder="Search cases, designers..." />
+                <button>Search</button>
+            </div>
+            <!-- Dark Mode Toggle -->
+            <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+                <span>Dark Mode</span>
+                <i class="fas fa-moon"></i>
+            </div>
+            <!-- User Info -->
+            <div class="user-info">Hello {{ user.username }}! <a href="{% url 'logout' %}">Log off</a></div>
+        </div>
+
+        <!-- Content Block -->
+        <div>
+            {% block content %}
+            <h1>Welcome to LinksHub</h1>
+            <p>This is your dashboard.</p>
+
+            <!-- Widgets -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="widget">
+                        <h3>Total Incoming Cases</h3>
+                        <div class="value">50</div>
+                        <div class="description">Filtered by Today</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="widget">
+                        <h3>In Lab Cases</h3>
+                        <div class="value">25</div>
+                        <div class="description">Cases currently in lab</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call Center Performance Chart -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="chart-container">
+                        <h3>Call Center Performance</h3>
+                        <canvas id="callCenterPerformance"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Analytics -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="widget">
+                        <h3>Top-Performing Designers</h3>
+                        <div class="value">John Doe</div>
+                        <div class="description">Highest case completion rate</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="widget">
+                        <h3>Recurring Issues</h3>
+                        <div class="value">Adjustments</div>
+                        <div class="description">Most common issue reported</div>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            const body = document.body;
+            body.classList.toggle('dark-mode');
+
+            // Save preference to localStorage
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        // Apply dark mode on page load
+        function applyDarkMode() {
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Initialize dark mode
+        applyDarkMode();
+
+        // Call Center Performance Chart
+        const ctx = document.getElementById('callCenterPerformance').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                datasets: [{
+                    label: 'Number of Calls',
+                    data: [12, 19, 3, 5, 2],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Calls'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Day of Week'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

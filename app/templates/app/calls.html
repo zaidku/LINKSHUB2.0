@@ -1,0 +1,665 @@
+{% extends 'app/layout.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calls Page - Enterprise</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Add your existing CSS here */
+        body {
+            background: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .sticky-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #343a40;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            z-index: 10;
+        }
+
+            .sticky-bar button {
+                margin: 0 5px;
+            }
+
+        .dashboard-item p {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .tab-content .tab-pane {
+            display: none;
+        }
+
+            .tab-content .tab-pane.active {
+                display: block;
+            }
+
+        .stats-card {
+            background: #2d3748;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+            .stats-card h5, .stats-card p {
+                margin: 0;
+            }
+
+            .stats-card h5 {
+                font-size: 1rem;
+            }
+
+            .stats-card p {
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+
+        .section-title {
+            margin: 20px 0 10px;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .table-hover tbody tr:hover {
+            background: #e9ecef;
+            cursor: pointer;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+            padding: 0.4em 0.6em;
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+        }
+
+            .btn:hover {
+                transform: scale(1.05);
+            }
+
+        .dark-mode {
+            background: #333;
+            color: white;
+        }
+
+            .dark-mode .card {
+                background: #444;
+                color: white;
+            }
+
+            .dark-mode .navbar {
+                background: #222 !important;
+            }
+
+            .dark-mode .sticky-bar {
+                background: #222;
+            }
+        /* Full-screen modal */
+        .fullscreen-modal .modal-dialog {
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .fullscreen-modal .modal-content {
+            height: 100vh;
+            border-radius: 0;
+        }
+        /* Tags styling */
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+        /* Search box */
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+            .search-box input {
+                flex: 1;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            .search-box button {
+                padding: 10px 20px;
+                border: none;
+                background: #007bff;
+                color: white;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+        .bg-purple {
+            background-color: #6f42c1 !important; /* Purple */
+        }
+
+        .bg-teal {
+            background-color: #20c997 !important; /* Teal */
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Calls Dashboard</span>
+            <button class="btn btn-outline-light btn-sm" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        </div>
+    </nav>
+
+    <!-- Search Box -->
+    <div class="container my-4">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by Case #, Patient Name, Doctor Name, or Account #">
+            <button onclick="searchCases()"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+
+    <!-- Enterprise Dashboard View -->
+    <div class="container my-4">
+        <div class="row text-center mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm bg-primary text-white">
+                    <div class="card-body">
+                        <h5>Total Open Cases</h5>
+                        <p id="total-cases">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm bg-danger text-white">
+                    <div class="card-body">
+                        <h5>High-Priority Calls</h5>
+                        <p id="high-priority">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm bg-success text-white">
+                    <div class="card-body">
+                        <h5>Active Agents</h5>
+                        <p id="active-agents">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm bg-warning text-dark">
+                    <div class="card-body">
+                        <h5>Outbound Calls</h5>
+                        <p id="outbound">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm bg-purple text-white">
+                    <div class="card-body">
+                        <h5>Inbound Calls</h5>
+                        <p id="inbound">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm bg-secondary text-white">
+                    <div class="card-body">
+                        <h5>Aboandoned Calls</h5>
+                        <p id="aboandoned">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="container my-4">
+        <ul class="nav nav-tabs" id="dashboardTabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-tab="all">All Calls</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-tab="customer">Customer Service</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-tab="tech">Technical Advisors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-tab="scheduling">Scheduling</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-tab="follow-ups">Follow-Ups</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-tab="analytics">Analytics</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="container">
+        <div class="tab-content">
+            <!-- All Calls Tab -->
+            <div class="tab-pane active" id="all">
+                <h5 class="section-title">All Calls Overview</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Case Information</h5>
+                                <p><strong> Patient Name:</strong> <span id="patient-name">Select a call</span></p>
+                                <p><strong>Contact:</strong> <span id="caller-contact">---</span></p>
+                                <p><strong>Case #:</strong> <span id="case-number">---</span></p>
+                                <p><strong>Tooth #:</strong> <span id="tooth-number">---</span></p>
+                                <p><strong>Material:</strong> <span id="material">---</span></p>
+                                <p><strong>Shade:</strong> <span id="shade">---</span></p>
+                                <p><strong>Shipping date:</strong> <span id="shipping-date">---</span></p>
+                                <p><strong>Due Date:</strong> <span id="due-date">---</span></p>
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select" id="status" onchange="updateStatus()">
+                                        <option value="Pending">Pending</option>
+                                        <option value="Done">Done</option>
+                                        <option value="Updated">Updated</option>
+                                        <option value="Needs Follow-Up">Needs Follow-Up</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tags" class="form-label">Tags</label>
+                                    <input type="text" class="form-control" id="tags" placeholder="Add tags (e.g., #Urgent, #Follow-Up, #WaitingForLab, #Outsourced, #Digital, #ManagerQC)">
+                                    <div class="tags-input" id="tags-container"></div>
+                                </div>
+                                <span id="call-status" class="badge bg-secondary">---</span>
+                                <div class="mt-3">
+                                    <button class="btn btn-primary btn-sm w-100 mb-2" data-bs-toggle="modal" data-bs-target="#addCallModal">Add New Call</button>
+                                    <button class="btn btn-secondary btn-sm w-100 mb-2" onclick="editCall()">Edit Case info</button>
+                                    <button class="btn btn-secondary btn-sm w-100 mb-2" onclick="transferCall()">Transfer Call</button>
+                                    <button class="btn btn-danger btn-sm w-100" onclick="endCall()">End Call</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>All Calls</h5>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Caller Name</th>
+                                            <th>Case #</th>
+                                            <th>Contact</th>
+                                            <th>Status</th>
+                                            <th>Tags</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr onclick="selectCall('John Doe', '+1 234 567 890', '#12345', 'Pending', '10:30 AM', 'Tooth 12', 'A2', '2023-10-15', ['#Urgent', '#Follow-Up'])">
+                                            <td>John Doe</td>
+                                            <td>#12345</td>
+                                            <td>+1 234 567 890</td>
+                                            <td><span class="badge bg-warning text-dark">Pending</span></td>
+                                            <td><span class="badge bg-primary">#Urgent</span> <span class="badge bg-info">#Follow-Up</span></td>
+                                            <td>10:30 AM</td>
+                                        </tr>
+                                        <tr onclick="selectCall('Jane Smith', '+1 987 654 321', '#67890', 'Resolved', '9:15 AM', 'Tooth 5', 'B1', '2023-10-10', ['#WaitingForLab'])">
+                                            <td>Jane Smith</td>
+                                            <td>#67890</td>
+                                            <td>+1 987 654 321</td>
+                                            <td><span class="badge bg-success">Resolved</span></td>
+                                            <td><span class="badge bg-secondary">#WaitingForLab</span></td>
+                                            <td>9:15 AM</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Service Tab -->
+            <div class="tab-pane" id="customer">
+                <h5 class="section-title">Customer Service Dashboard</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Call Queue</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item">John Doe (#12345) - Pending - High</li>
+                                    <li class="list-group-item">Jane Smith (#67890) - Resolved - Normal</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Customer Information</h5>
+                                <p><strong>Name:</strong> John Doe</p>
+                                <p><strong>Contact:</strong> +1 234 567 890</p>
+                                <p><strong>Case #:</strong> #12345</p>
+                                <p><strong>Status:</strong> <span class="badge bg-warning text-dark">Pending</span></p>
+                                <div class="mt-3">
+                                    <button class="btn btn-success btn-sm" onclick="resolveCall()">Resolve Call</button>
+                                    <button class="btn btn-warning btn-sm" onclick="tagFollowUp()">Tag for Follow-Up</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tech Advisors Tab -->
+            <div class="tab-pane" id="tech">
+                <h5 class="section-title">Tech Advisors Dashboard</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Technical Cases</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item">Case #12345 - Crown Issue - High</li>
+                                    <li class="list-group-item">Case #67890 - Bridge Issue - Normal</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Case Details</h5>
+                                <p><strong>Case #:</strong> #12345</p>
+                                <p><strong>Issue:</strong> Crown Issue</p>
+                                <p><strong>Status:</strong> <span class="badge bg-warning text-dark">Pending</span></p>
+                                <div class="mt-3">
+                                    <button class="btn btn-success btn-sm" onclick="resolveCase()">Resolve Case</button>
+                                    <button class="btn btn-danger btn-sm" onclick="escalateCase()">Escalate Case</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduling Tab -->
+            <div class="tab-pane" id="scheduling">
+                <h5 class="section-title">Scheduling Dashboard</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Appointments</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item">John Doe - 2023-10-15 - 10:30 AM</li>
+                                    <li class="list-group-item">Jane Smith - 2023-10-10 - 9:15 AM</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Schedule New Appointment</h5>
+                                <form id="scheduleForm">
+                                    <div class="mb-3">
+                                        <label for="patientName" class="form-label">Patient Name</label>
+                                        <input type="text" class="form-control" id="patientName" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="appointmentDate" class="form-label">Appointment Date</label>
+                                        <input type="date" class="form-control" id="appointmentDate" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="appointmentTime" class="form-label">Appointment Time</label>
+                                        <input type="time" class="form-control" id="appointmentTime" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Schedule</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Sticky Bar -->
+    <footer class="sticky-bar">
+        <button class="btn btn-success btn-sm" onclick="addCall()">Add Call</button>
+        <button class="btn btn-info btn-sm" onclick="assignToTeam()">Assign to Team</button>
+        <button class="btn btn-warning btn-sm" onclick="escalate()">Escalate</button>
+        <span class="mx-3">00:05:30</span>
+        <button class="btn btn-primary btn-sm" onclick="saveAndNext()">Save & Next</button>
+    </footer>
+
+    <!-- Add/Edit Call Modal -->
+    <div class="modal fade fullscreen-modal" id="addCallModal" tabindex="-1" aria-labelledby="addCallModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCallModalLabel">Add/Edit Call</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="callForm">
+                        <div class="mb-3">
+                            <label for="doctorName" class="form-label">Doctor's Name</label>
+                            <input type="text" class="form-control" id="doctorName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="patientName" class="form-label">Patient's Name</label>
+                            <input type="text" class="form-control" id="patientName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="toothNumber" class="form-label">Tooth Number</label>
+                            <input type="text" class="form-control" id="toothNumber" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="shade" class="form-label">Shade</label>
+                            <input type="text" class="form-control" id="shade" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="dueDate" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="dueDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" required>
+                                <option value="Pending">Pending</option>
+                                <option value="Done">Done</option>
+                                <option value="Updated">Updated</option>
+                                <option value="Needs Follow-Up">Needs Follow-Up</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="tags" placeholder="Add tags (e.g., #Urgent, #Follow-Up)">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCall()">Save Call</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Call Modal -->
+    <div class="modal fade" id="transferCallModal" tabindex="-1" aria-labelledby="transferCallModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transferCallModalLabel">Transfer Call</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transferForm">
+                        <div class="mb-3">
+                            <label for="transferTo" class="form-label">Transfer To</label>
+                            <select class="form-select" id="transferTo" required>
+                                <option value="Customer Service">Customer Service</option>
+                                <option value="Tech Advisors">Tech Advisors</option>
+                                <option value="Scheduling">Scheduling</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmTransfer()">Transfer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // JavaScript for Interactivity
+        const tabs = document.querySelectorAll('[data-tab]');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function (e) {
+                e.preventDefault();
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const target = tab.getAttribute('data-tab');
+                tabPanes.forEach(pane => {
+                    pane.classList.remove('active');
+                    if (pane.id === target) {
+                        pane.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        function selectCall(name, contact, caseNumber, status, time, toothNumber, shade, dueDate, tags) {
+            document.getElementById('caller-name').textContent = name;
+            document.getElementById('caller-contact').textContent = contact;
+            document.getElementById('case-number').textContent = caseNumber;
+            document.getElementById('tooth-number').textContent = toothNumber;
+            document.getElementById('shade').textContent = shade;
+            document.getElementById('due-date').textContent = dueDate;
+            document.getElementById('status').value = status;
+            updateTags(tags);
+            const statusBadge = document.getElementById('call-status');
+            statusBadge.textContent = status;
+            statusBadge.className = status === 'Resolved' ? 'badge bg-success' : 'badge bg-warning text-dark';
+        }
+
+        function updateStatus() {
+            const status = document.getElementById('status').value;
+            const statusBadge = document.getElementById('call-status');
+            statusBadge.textContent = status;
+            statusBadge.className = status === 'Done' ? 'badge bg-success' : 'badge bg-warning text-dark';
+        }
+
+        function updateTags(tags) {
+            const tagsContainer = document.getElementById('tags-container');
+            tagsContainer.innerHTML = tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+        }
+
+        function searchCases() {
+            const query = document.getElementById('searchInput').value;
+            console.log('Searching for:', query);
+            // Implement search logic here
+        }
+
+        function saveCall() {
+            const doctorName = document.getElementById('doctorName').value;
+            const patientName = document.getElementById('patientName').value;
+            const toothNumber = document.getElementById('toothNumber').value;
+            const shade = document.getElementById('shade').value;
+            const dueDate = document.getElementById('dueDate').value;
+            const status = document.getElementById('status').value;
+            const tags = document.getElementById('tags').value.split(',').map(tag => tag.trim());
+
+            // Save the call (you can integrate with a backend here)
+            console.log('Call Saved:', { doctorName, patientName, toothNumber, shade, dueDate, status, tags });
+
+            // Close the modal
+            const addCallModal = bootstrap.Modal.getInstance(document.getElementById('addCallModal'));
+            addCallModal.hide();
+        }
+
+        function editCall() {
+            const addCallModal = new bootstrap.Modal(document.getElementById('addCallModal'));
+            addCallModal.show();
+        }
+
+        function transferCall() {
+            const transferCallModal = new bootstrap.Modal(document.getElementById('transferCallModal'));
+            transferCallModal.show();
+        }
+
+        function confirmTransfer() {
+            const transferTo = document.getElementById('transferTo').value;
+            console.log('Call Transferred to:', transferTo);
+
+            // Close the modal
+            const transferCallModal = bootstrap.Modal.getInstance(document.getElementById('transferCallModal'));
+            transferCallModal.hide();
+        }
+
+        function endCall() {
+            console.log('Call Ended');
+        }
+
+        function addCall() {
+            const addCallModal = new bootstrap.Modal(document.getElementById('addCallModal'));
+            addCallModal.show();
+        }
+
+        function assignToTeam() {
+            console.log('Assign to Team clicked');
+        }
+
+        function escalate() {
+            console.log('Escalate clicked');
+        }
+
+        function saveAndNext() {
+            console.log('Save & Next clicked');
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

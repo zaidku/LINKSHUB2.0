@@ -1,0 +1,603 @@
+{% extends 'app/layout.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outsource</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom Styles (unchanged) */
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .dashboard-header {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+            .dashboard-header h1 {
+                font-size: 2rem;
+                font-weight: bold;
+                color: #333;
+            }
+
+        .nav-tabs .nav-link {
+            color: #333;
+            font-weight: bold;
+            border: 1px solid transparent;
+            border-radius: 0;
+        }
+
+            .nav-tabs .nav-link.active {
+                background-color: #fff;
+                border-color: #dee2e6 #dee2e6 #fff;
+                color: #333;
+            }
+
+            .nav-tabs .nav-link:hover {
+                border-color: #dee2e6 #dee2e6 #ddd;
+            }
+
+        .widget {
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+            .widget h3 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+                color: #333;
+            }
+
+            .widget .value {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #333;
+            }
+
+        .table th {
+            background-color: #f8f9fa;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table td {
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Updated Button Styles to Match Your CSS */
+        .btn-custom,
+        .filters .btn,
+        .payment-actions .btn,
+        .btn-primary {
+            background-color: #007bff; /* Blue background */
+            color: white; /* White text */
+            padding: 8px 15px; /* Padding */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer cursor */
+            font-size: 14px; /* Font size */
+            transition: all 0.3s; /* Smooth transition */
+        }
+
+            .btn-custom:hover,
+            .filters .btn:hover,
+            .payment-actions .btn:hover,
+            .btn-primary:hover {
+                background-color: #0056b3; /* Darker blue on hover */
+            }
+
+        .btn-secondary {
+            background-color: #6c757d; /* Gray background */
+            color: white; /* White text */
+        }
+
+            .btn-secondary:hover {
+                background-color: #5a6268; /* Darker gray on hover */
+            }
+
+        .btn-danger {
+            background-color: #dc3545; /* Red background */
+            color: white; /* White text */
+        }
+
+            .btn-danger:hover {
+                background-color: #c82333; /* Darker red on hover */
+            }
+
+        /* Designer Management Styles */
+        .designer-management-tabs .nav-link {
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .designer-management-content {
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-top: none;
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #e9e9e9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>Outsource Dashboard</h1>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="outsourced-cases-tab" data-bs-toggle="tab" data-bs-target="#outsourced-cases" type="button" role="tab">Outsourced Cases</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="cases-with-designers-tab" data-bs-toggle="tab" data-bs-target="#cases-with-designers" type="button" role="tab">Cases with Designers</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="received-ready-to-mill-tab" data-bs-toggle="tab" data-bs-target="#received-ready-to-mill" type="button" role="tab">Received Ready to Mill</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="canceled-cases-tab" data-bs-toggle="tab" data-bs-target="#canceled-cases" type="button" role="tab">Canceled Cases</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="counting-tab" data-bs-toggle="tab" data-bs-target="#counting" type="button" role="tab">Counting</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="payment-tab" data-bs-toggle="tab" data-bs-target="#payment" type="button" role="tab">Payment</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="designer-assignments-tab" data-bs-toggle="tab" data-bs-target="#designer-assignments" type="button" role="tab">Designer Assignments</button>
+            </li>
+            <!-- Add Designer Management Tab -->
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="designer-management-tab" data-bs-toggle="tab" data-bs-target="#designer-management" type="button" role="tab">Designer Management</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabsContent">
+            <!-- Outsourced Cases Tab -->
+            <div class="tab-pane fade show active" id="outsourced-cases" role="tabpanel">
+                <div class="filters my-3">
+                    <button class="btn btn-primary" data-filter="today">Today</button>
+                    <button class="btn btn-primary" data-filter="last-week">Last Week</button>
+                    <button class="btn btn-primary" data-filter="last-month">Last Month</button>
+                    <button class="btn btn-primary" data-filter="last-year">Last Year</button>
+                    <div class="search-box-container">
+                        <input type="text" class="form-control" placeholder="Search by Clinic, Designer, or Case ID">
+                        <button class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Clinic Name</th>
+                            <th>Case ID</th>
+                            <th>Tooth Number</th>
+                            <th>Designer Name</th>
+                            <th>Unit Count</th>
+                            <th>Case Status</th>
+                            <th>Cost to Lab</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cases with Designers Tab -->
+            <div class="tab-pane fade" id="cases-with-designers" role="tabpanel">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Designer Name</th>
+                            <th>Case ID</th>
+                            <th>Unit Count</th>
+                            <th>Status</th>
+                            <th>Time Since Received</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Received Ready to Mill Tab -->
+            <div class="tab-pane fade" id="received-ready-to-mill" role="tabpanel">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Tooth Number</th>
+                            <th>Unit Count</th>
+                            <th>Designer Name</th>
+                            <th>Received Date</th>
+                            <th>Status</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Canceled Cases Tab -->
+            <div class="tab-pane fade" id="canceled-cases" role="tabpanel">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Clinic Name</th>
+                            <th>Tooth Number</th>
+                            <th>Status</th>
+                            <th>Cancellation Reason</th>
+                            <th>Designer Name</th>
+                            <th>Units</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Counting Tab -->
+            <div class="tab-pane fade" id="counting" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="widget">
+                            <h3>Outgoing Cases to Designers</h3>
+                            <p class="value">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="widget">
+                            <h3>Incoming from Designers</h3>
+                            <p class="value">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="widget">
+                            <h3>Remakes per Designer</h3>
+                            <p class="value">0</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="widget">
+                            <h3>Profit and Loss</h3>
+                            <p class="value">$0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Tab -->
+            <div class="tab-pane fade" id="payment" role="tabpanel">
+                <div class="payment-actions">
+                    <button class="btn btn-primary">Pay Selected</button>
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Case ID</th>
+                            <th>Designer Name</th>
+                            <th>Status</th>
+                            <th>Amount</th>
+                            <th>Payment Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" class="form-check-input"></td>
+                            <td>12345</td>
+                            <td>John Doe</td>
+                            <td>Completed</td>
+                            <td>$50</td>
+                            <td>Unpaid</td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="form-check-input"></td>
+                            <td>67890</td>
+                            <td>Jane Smith</td>
+                            <td>Completed</td>
+                            <td>$75</td>
+                            <td>Paid</td>
+                        </tr>
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Designer Assignments Tab -->
+            <div class="tab-pane fade" id="designer-assignments" role="tabpanel">
+                <div class="mb-3">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignCaseModal">Assign Case</button>
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Case ID</th>
+                            <th>Clinic</th>
+                            <th>Tooth Number</th>
+                            <th>Designer</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="designer-assignments-list">
+                        <!-- Rows will be dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Designer Management Tab -->
+            <div class="tab-pane fade" id="designer-management" role="tabpanel">
+                <div class="designer-management-content">
+                    <!-- Sub-Tabs for Designer Management -->
+                    <ul class="nav nav-tabs designer-management-tabs" id="designerManagementTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="designer-list-tab" data-bs-toggle="tab" data-bs-target="#designer-list" type="button" role="tab">Designer List</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="messaging-tab" data-bs-toggle="tab" data-bs-target="#messaging" type="button" role="tab">Messaging</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Payments</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="performance-tab" data-bs-toggle="tab" data-bs-target="#performance" type="button" role="tab">Performance</button>
+                        </li>
+                    </ul>
+
+                    <!-- Sub-Tab Content -->
+                    <div class="tab-content" id="designerManagementTabsContent">
+                        <!-- Overview Tab -->
+                        <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                            <h3>Overview</h3>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="widget">
+                                        <h3>Total Designers</h3>
+                                        <p class="value">50</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="widget">
+                                        <h3>Current Month's Payments</h3>
+                                        <p class="value">$5000</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="widget">
+                                        <h3>Upcoming Payments</h3>
+                                        <p class="value">$3000</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="chart-placeholder">Monthly Design Requests Chart</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="chart-placeholder">Price Trends Over Time Chart</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Designer List Tab -->
+                        <div class="tab-pane fade" id="designer-list" role="tabpanel">
+                            <h3>Designer Management</h3>
+                            <div class="mb-3">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDesignerModal">Add Designer</button>
+                            </div>
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>PayPal ID</th>
+                                        <th>Workflow Type</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows will be dynamically populated -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Messaging Tab -->
+                        <div class="tab-pane fade" id="messaging" role="tabpanel">
+                            <h3>Messaging</h3>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="list-group">
+                                        <a href="#" class="list-group-item list-group-item-action">Designer 1</a>
+                                        <a href="#" class="list-group-item list-group-item-action">Designer 2</a>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Chat with Designer</h5>
+                                            <div id="chat-messages" style="height: 300px; overflow-y: auto;">
+                                                <!-- Chat messages will appear here -->
+                                            </div>
+                                            <textarea class="form-control mt-3" placeholder="Type your message..."></textarea>
+                                            <button class="btn btn-primary mt-3">Send</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payments Tab -->
+                        <div class="tab-pane fade" id="payments" role="tabpanel">
+                            <h3>Payments</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="widget">
+                                        <h3>Total Paid So Far</h3>
+                                        <p class="value">$8000</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="widget">
+                                        <h3>Upcoming Charges</h3>
+                                        <p class="value">$2000</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Designer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows will be dynamically populated -->
+                                </tbody>
+                            </table>
+                            <button class="btn btn-primary">Export Payment Report (CSV/Excel)</button>
+                        </div>
+
+                        <!-- Performance Tab -->
+                        <div class="tab-pane fade" id="performance" role="tabpanel">
+                            <h3>Designer Performance</h3>
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Designer</th>
+                                        <th>Total Designs</th>
+                                        <th>Avg Turnaround Time</th>
+                                        <th>Rating</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows will be dynamically populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assign Case Modal -->
+    <div class="modal fade" id="assignCaseModal" tabindex="-1" aria-labelledby="assignCaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignCaseModalLabel">Assign Case</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignCaseForm">
+                        <div class="mb-3">
+                            <label for="caseId" class="form-label">Case ID</label>
+                            <input type="text" class="form-control" id="caseId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="designer" class="form-label">Designer</label>
+                            <select class="form-select" id="designer" required>
+                                <option value="">Select Designer</option>
+                                <option value="John Doe">John Doe</option>
+                                <option value="Jane Smith">Jane Smith</option>
+                                <option value="Alice Johnson">Alice Johnson</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="caseType" class="form-label">Case Type</label>
+                            <select class="form-select" id="caseType" required>
+                                <option value="">Select Case Type</option>
+                                <option value="Posterior">Posterior</option>
+                                <option value="Anterior">Anterior</option>
+                                <option value="Implant">Implant</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Assign</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Designer Modal -->
+    <div class="modal fade" id="addDesignerModal" tabindex="-1" aria-labelledby="addDesignerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDesignerModalLabel">Add Designer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDesignerForm">
+                        <div class="mb-3">
+                            <label for="designerName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="designerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="designerEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="designerEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="designerPayPal" class="form-label">PayPal ID</label>
+                            <input type="text" class="form-control" id="designerPayPal" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="designerWorkflow" class="form-label">Workflow Type</label>
+                            <select class="form-select" id="designerWorkflow" required>
+                                <option value="Post">Post</option>
+                                <option value="Ant">Ant</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Designer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+{% endblock %}

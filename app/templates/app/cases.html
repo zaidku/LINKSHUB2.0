@@ -1,0 +1,234 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+	<h2>Cases Management</h2>
+
+	<!-- Tabs Navigation -->
+	<ul class="nav nav-tabs" id="casesTabs" role="tablist">
+		<li class="nav-item" role="presentation">
+			<button class="nav-link active" id="all-cases-tab" data-bs-toggle="tab" data-bs-target="#all-cases" type="button" role="tab">All Cases</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="create-case-tab" data-bs-toggle="tab" data-bs-target="#create-case" type="button" role="tab">Create New Case</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="remakes-tab" data-bs-toggle="tab" data-bs-target="#remakes" type="button" role="tab">Remakes</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="canceled-tab" data-bs-toggle="tab" data-bs-target="#canceled" type="button" role="tab">Canceled</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="in-lab-tab" data-bs-toggle="tab" data-bs-target="#in-lab" type="button" role="tab">In Lab</button>
+		</li>
+		<li class="nav-item" role="presentation">
+			<button class="nav-link" id="adjustments-tab" data-bs-toggle="tab" data-bs-target="#adjustments" type="button" role="tab">Adjustments</button>
+		</li>
+	</ul>
+
+	<!-- Tab Content -->
+	<div class="tab-content mt-4" id="casesTabsContent">
+		<!-- All Cases Tab -->
+		<div class="tab-pane fade show active" id="all-cases" role="tabpanel" aria-labelledby="all-cases-tab">
+			<h3>All Cases</h3>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Case Number</th>
+						<th>Patient Name</th>
+						<th>Shade</th>
+						<th>Tooth Number</th>
+						<th>Status</th>
+						<th>Due Date</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for case in all_cases %}
+					<tr>
+						<td>{{ case.case_number }}</td>
+						<td>{{ case.patient_name }}</td>
+						<td>{{ case.shade }}</td>
+						<td>{{ case.tooth_number }}</td>
+						<td>{{ case.status }}</td>
+						<td>{{ case.due_date }}</td>
+						<td>
+							<button class="btn btn-sm btn-primary">View</button>
+							<button class="btn btn-sm btn-danger">Delete</button>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Create New Case Tab -->
+		<div class="tab-pane fade" id="create-case" role="tabpanel" aria-labelledby="create-case-tab">
+			<h3>Create New Case</h3>
+			<form id="createCaseForm">
+				{% csrf_token %}
+				<!-- Row 1: Case Details -->
+				<div class="row g-3">
+					<div class="col-md-4">
+						<label for="caseId" class="form-label">Case ID</label>
+						<input type="text" id="caseId" class="form-control" readonly>
+					</div>
+					<div class="col-md-4">
+						<label for="createTime" class="form-label">Create Time</label>
+						<input type="text" id="createTime" class="form-control" readonly>
+					</div>
+					<div class="col-md-4">
+						<label for="dentistType" class="form-label">Dentistry Type</label>
+						<select id="dentistType" class="form-select">
+							<option value="restoration">Restoration</option>
+							<option value="orthodontics">Orthodontics</option>
+						</select>
+					</div>
+				</div>
+
+				<!-- Row 2: Patient Details -->
+				<div class="row g-3 mt-3">
+					<div class="col-md-6">
+						<label for="patientName" class="form-label">Patient Name</label>
+						<input type="text" id="patientName" class="form-control" placeholder="Enter Patient Name">
+					</div>
+					<div class="col-md-6">
+						<label for="notes" class="form-label">Notes</label>
+						<textarea id="notes" class="form-control" rows="3" placeholder="Add any notes..."></textarea>
+					</div>
+				</div>
+
+				<!-- Tooth Chart & Selection -->
+				<div class="row g-3 mt-4">
+					<div class="col-md-6">
+						<div class="border rounded p-4">
+							<div id="toothSvgPlaceholder" class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 300px;">
+								<p class="text-muted">SVG Tooth Chart Placeholder</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label">Tooth Type</label>
+						<div id="selectionButtons" class="d-flex flex-wrap gap-2">
+							<button type="button" class="btn btn-outline-primary">Full Crown</button>
+							<button type="button" class="btn btn-outline-primary">Pontic</button>
+							<button type="button" class="btn btn-outline-primary">Inlay</button>
+							<button type="button" class="btn btn-outline-primary">Veneer</button>
+							<button type="button" class="btn btn-outline-primary">Antagonist</button>
+						</div>
+						<div class="text-end mt-3">
+							<button type="button" class="btn btn-danger">Clear All</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Shade System -->
+				<div class="row g-3 mt-4">
+					<div class="col-md-6">
+						<label for="shadeSystem" class="form-label">Shade System</label>
+						<select id="shadeSystem" class="form-select" onchange="updateShades()">
+							<option value="vita-classical">VITA Classical</option>
+							<option value="vita-3d-master">VITA 3D-Master</option>
+							<option value="chromascop">Chromascop</option>
+							<option value="bioform">Bioform</option>
+							<option value="trubyte">Trubyte Bioform</option>
+							<option value="digital">Digital</option>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label for="shades" class="form-label">Shades</label>
+						<select id="shades" class="form-select">
+							<!-- Shades will be dynamically populated -->
+						</select>
+					</div>
+				</div>
+
+				<!-- Submit Button -->
+				<div class="text-end mt-4">
+					<button type="button" class="btn btn-secondary">Cancel</button>
+					<button type="submit" class="btn btn-success">Save Case</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		const caseIdField = document.getElementById("caseId");
+		const createTimeField = document.getElementById("createTime");
+
+		// Generate a random Case ID
+		const caseId = "CASE-" + Math.floor(1000 + Math.random() * 9000);
+		caseIdField.value = caseId;
+
+		// Set the current time
+		const now = new Date();
+		createTimeField.value = now.toLocaleString();
+
+		// Shade data for each system
+		const shadesData = {
+			"vita-classical": [
+				"A1", "A2", "A3", "A3.5", "A4",
+				"B1", "B2", "B3", "B4",
+				"C1", "C2", "C3", "C4",
+				"D2", "D3", "D4"
+			],
+			"vita-3d-master": [
+				"1M1", "1M2", "1M3",
+				"2L1.5", "2M1", "2M2", "2M3", "2R1.5",
+				"3L1.5", "3M1", "3M2", "3M3", "3R1.5",
+				"4L1.5", "4M1", "4M2", "4M3", "4R1.5",
+				"5M1", "5M2", "5M3"
+			],
+			"chromascop": [
+				"110", "120", "130", "140", "150", "160",
+				"210", "220", "230", "240", "250", "260",
+				"310", "320", "330", "340", "350", "360",
+				"410", "420", "430", "440", "450", "460",
+				"510", "520", "530", "540", "550", "560"
+			],
+			"bioform": [
+				"A1", "A2", "A3", "A4",
+				"B1", "B2", "B3", "B4",
+				"C1", "C2", "C3", "C4",
+				"D2", "D3", "D4"
+			],
+			"trubyte": [
+				"59", "62", "66", "69", "71", "81", "85", "89", "91",
+				"95", "99", "102", "105", "107", "110", "114", "118"
+			],
+			"digital": [
+				"VITA Easyshade", "Shofu ShadeEye NCC", "SpectroShade",
+				"Crystaleye", "Ivoclar Digital Shades", "Shadepilot"
+			]
+		};
+
+		// Function to update the shades dropdown
+		function updateShades() {
+			const shadeSystem = document.getElementById("shadeSystem").value;
+			const shadesDropdown = document.getElementById("shades");
+
+			// Clear existing options
+			shadesDropdown.innerHTML = "";
+
+			// Get the shades for the selected system
+			const shades = shadesData[shadeSystem] || [];
+
+			// Populate the dropdown with new options
+			shades.forEach(shade => {
+				const option = document.createElement("option");
+				option.value = shade;
+				option.textContent = shade;
+				shadesDropdown.appendChild(option);
+			});
+		}
+
+		// Initialize the shades dropdown with the default system (VITA Classical)
+		updateShades();
+
+		// Attach the onchange event to the shade system dropdown
+		document.getElementById("shadeSystem").addEventListener("change", updateShades);
+	});
+</script>
+{% endblock %}

@@ -1,0 +1,315 @@
+{% extends 'app/layout.html' %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">{{ title }} Dashboard</h1>
+
+    <!-- Sales Summary Table -->
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th></th>
+                <th>Month</th>
+                <th>Year</th>
+                <th>Lifetime</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Current</td>
+                <td>$0.00</td>
+                <td>$0.00</td>
+                <td>$0.00</td>
+            </tr>
+            <tr>
+                <td>Prior</td>
+                <td>$0.00</td>
+                <td>$0.00</td>
+                <td>$0.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Tabs for Time Periods -->
+    <ul class="nav nav-tabs mt-4" id="salesTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="month-tab" data-bs-toggle="tab" href="#this-month" role="tab" aria-controls="this-month" aria-selected="true">This Month</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="year-tab" data-bs-toggle="tab" href="#this-year" role="tab" aria-controls="this-year" aria-selected="false">This Year</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="lifetime-tab" data-bs-toggle="tab" href="#lifetime" role="tab" aria-controls="lifetime" aria-selected="false">Lifetime</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="prior-tab" data-bs-toggle="tab" href="#prior" role="tab" aria-controls="prior" aria-selected="false">Prior</a>
+        </li>
+    </ul>
+
+    <!-- Charts -->
+    <div class="row mt-5">
+        <!-- Sales Overview Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Sales Overview</h5>
+                    <canvas id="salesOverviewChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Distribution Chart -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Sales Distribution</h5>
+                    <canvas id="salesDistributionChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales per Account Chart -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Sales per Account</h5>
+                    <canvas id="salesAccountChart" width="100" height="50"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Chart Section -->
+<div class="row mt-5">
+    <!-- Discounted vs. Full-Price Sales Chart -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Discounted vs. Full-Price Sales</h5>
+                <canvas id="discountVsFullChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancelled/Adjusted Orders -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Cancelled/Adjusted Orders</h5>
+                <canvas id="cancelAdjustedChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Case Type Trends and Sales Conversion Rate -->
+<div class="row mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Case Type Trends</h5>
+                <canvas id="caseTypeTrendsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Sales Conversion Rate</h5>
+                <canvas id="conversionRateChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lifetime Value (LTV) and Customer Retention -->
+<div class="row mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Lifetime Value (LTV) of Customers</h5>
+                <canvas id="ltvChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Customer Retention and Repeat Sales</h5>
+                <canvas id="retentionChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Static Data
+    const productLabels = ['Zirconia', 'eMax', 'Metal', 'Acrylic']; // Products
+    const salesData = {
+        thisMonth: { dollar: [4000, 3000, 2000, 1000], volume: [40, 30, 20, 10] },
+        thisYear: { dollar: [40000, 30000, 20000, 10000], volume: [400, 300, 200, 100] },
+        lifetime: { dollar: [100000, 80000, 60000, 40000], volume: [1000, 800, 600, 400] },
+        prior: { dollar: [2000, 1500, 1000, 500], volume: [20, 15, 10, 5] },
+    };
+
+    const accountLabels = ['SunShine Clinic', 'Dr Mike', 'Anahiem Dental', 'Smile Design', 'The Dental Office of California']; // Accounts
+    const accountData = [3500, 8500, 5400, 18021, 53056]; // Sales per account (static)
+
+    // Sales Overview Chart
+    const overviewCtx = document.getElementById('salesOverviewChart').getContext('2d');
+    let salesOverviewChart = new Chart(overviewCtx, {
+        type: 'bar',
+        data: {
+            labels: productLabels,
+            datasets: [
+                { label: 'Volume (Units)', data: salesData.thisMonth.volume, backgroundColor: 'yellow' },
+                { label: 'Dollar Amount ($)', data: salesData.thisMonth.dollar, backgroundColor: 'blue' },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'This Month Sales' },
+            },
+            scales: { y: { beginAtZero: true } },
+        },
+    });
+
+    // Pie Chart for Sales Distribution
+    const distributionCtx = document.getElementById('salesDistributionChart').getContext('2d');
+    new Chart(distributionCtx, {
+        type: 'pie',
+        data: {
+            labels: productLabels,
+            datasets: [{ data: salesData.thisMonth.dollar, backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'] }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Product Sales Distribution' } },
+        },
+    });
+
+    // Sample Data for New Charts
+    const dummyData = [45, 55];
+    const caseTypeData = [30, 40, 15, 25];
+    const retentionData = [20, 30, 50];
+
+    // Discounted vs. Full-Price Sales Chart
+    new Chart(document.getElementById('discountVsFullChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Discounted Sales', 'Full-Price Sales'],
+            datasets: [{
+                data: dummyData,
+                backgroundColor: ['#1cc88a', '#4e73df'],
+            }],
+        },
+        options: { plugins: { legend: { position: 'bottom' } } },
+    });
+
+    // Cancelled/Adjusted Orders Chart
+    new Chart(document.getElementById('cancelAdjustedChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Cancelled Orders', 'Adjusted Orders'],
+            datasets: [{
+                label: '# of Orders',
+                data: dummyData,
+                backgroundColor: ['#e74a3b', '#f6c23e'],
+            }],
+        },
+        options: { scales: { y: { beginAtZero: true } } },
+    });
+
+    // Case Type Trends Chart
+    new Chart(document.getElementById('caseTypeTrendsChart'), {
+        type: 'line',
+        data: {
+            labels: ['Zirconia', 'eMax', 'Metal', 'Acrylic'],
+            datasets: [{
+                label: 'Case Types',
+                data: caseTypeData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+            }],
+        },
+    });
+
+    // Sales Conversion Rate Chart
+    new Chart(document.getElementById('conversionRateChart'), {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'Conversion Rate (%)',
+                data: [25, 30, 35, 40],
+                borderColor: '#f6c23e',
+            }],
+        },
+    });
+
+    // Lifetime Value (LTV) Chart
+    new Chart(document.getElementById('ltvChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Customer A', 'Customer B', 'Customer C'],
+            datasets: [{
+                label: 'LTV ($)',
+                data: [5000, 7000, 10000],
+                backgroundColor: ['#36b9cc', '#1cc88a', '#4e73df'],
+            }],
+        },
+        options: { scales: { y: { beginAtZero: true } } },
+    });
+
+    // Customer Retention Chart
+    new Chart(document.getElementById('retentionChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['New Customers', 'Returning Customers', 'Loyal Customers'],
+            datasets: [{
+                data: retentionData,
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+            }],
+        },
+        options: { plugins: { legend: { position: 'bottom' } } },
+    });
+
+    // Sales per Account Chart
+    const accountCtx = document.getElementById('salesAccountChart').getContext('2d');
+    new Chart(accountCtx, {
+        type: 'bar',
+        data: {
+            labels: accountLabels,
+            datasets: [{ label: 'Sales ($)', data: accountData, backgroundColor: 'green' }],
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' }, title: { display: true, text: 'Sales per Account' } },
+            scales: { y: { beginAtZero: true } },
+        },
+    });
+
+    // Tab Switching for Sales Overview Chart
+    document.querySelectorAll('#salesTabs .nav-link').forEach(tab => {
+        tab.addEventListener('click', function () {
+            const selectedPeriod = this.id.replace('-tab', ''); // Extract time period
+            salesOverviewChart.data.datasets[0].data = salesData[selectedPeriod].volume;
+            salesOverviewChart.data.datasets[1].data = salesData[selectedPeriod].dollar;
+            salesOverviewChart.options.plugins.title.text = `${this.textContent} Sales`;
+            salesOverviewChart.update();
+        });
+    });
+</script>
+
+{% endblock scripts %}

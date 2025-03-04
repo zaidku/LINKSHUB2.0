@@ -1,0 +1,175 @@
+/* Reset and General Styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+}
+
+/* Layout */
+.custom-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Left Panel */
+.left-panel {
+    width: 35%;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+    .left-panel h1 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #007bff;
+    }
+
+.top-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+    .top-controls button {
+        background-color: #007bff;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+        .top-controls button:hover {
+            background-color: #0056b3;
+        }
+
+.form-section label,
+.notes-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.form-section input,
+.form-section select,
+.notes-section textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.notes-section textarea {
+    height: 80px;
+    resize: none;
+}
+
+.preview-section {
+    text-align: center;
+    background-color: #f8f9fa;
+    border: 1px dashed #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+    .preview-section h2 {
+        font-size: 18px;
+        color: #555;
+    }
+
+    .preview-section p {
+        font-size: 14px;
+        color: #999;
+    }
+
+html, body {
+    height: 100%;
+}
+
+.body-content {
+    flex: 1;
+}
+
+.container.body-content {
+    min-height: calc(100vh - 120px); /* Adjust based on your header/footer height */
+}
+
+footer {
+    flex-shrink: 0;
+}
+
+#loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+#back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+    z-index: 1000;
+}
+
+.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+    .dark-mode .navbar-dark {
+        background-color: #1a1a1a !important;
+    }
+
+    .dark-mode .card {
+        background-color: #1e1e1e;
+        color: #ffffff;
+    }
+
+    .dark-mode .table {
+        background-color: #1e1e1e;
+        color: #ffffff;
+    }
+
+    .dark-mode .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #2a2a2a;
+    }
+
+
+.navbar {
+    background-color: #343a40 !important; /* Set your desired color */
+    color: white;
+    position: sticky; /* Keeps it in place */
+    top: 0;
+    z-index: 1000; /* Ensures it stays on top */
+}
+
+
+.tooth-btn {
+    background-color: white;
+    border: 1px solid #007bff;
+    color: black;
+    padding: 5px 10px;
+    margin: 3px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+    .tooth-btn.selected {
+        background-color: #007bff;
+        color: white;
+    }

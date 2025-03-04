@@ -1,0 +1,19 @@
+{% extends 'app/layout.html' %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>Welcome to the extra page. You can customize this content as needed!</p>
+
+<!-- Example of adding more page-specific content -->
+<div>
+    <p>This is a dynamic web page built with Django. Enjoy exploring!</p>
+    <a href="{% url 'home' %}" class="btn btn-primary">Back to Dashboard</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    console.log("Extra page script loaded!");
+    // Add any page-specific JavaScript here
+</script>
+{% endblock %}

@@ -1,0 +1,573 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h2>LinksHub</h2>
+    <p class="lead">Advanced Lab Management System</p>
+    <p class="lead"> </p>
+    <p><a href="https://www.djangoproject.com/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
+</div>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .widget {
+            flex: 1;
+            min-width: 250px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+            .widget h3 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+                font-weight: bold;
+            }
+
+            .widget .value {
+                font-size: 1.8rem;
+                font-weight: bold;
+                margin-bottom: 5px;
+            }
+
+            .widget .description {
+                font-size: 0.9rem;
+                color: #666;
+            }
+
+            .widget.success {
+                border-top: 5px solid #28a745;
+            }
+
+            .widget.danger {
+                border-top: 5px solid #dc3545;
+            }
+
+            .widget.info {
+                border-top: 5px solid #007bff;
+            }
+
+            .widget.warning {
+                border-top: 5px solid #ffc107;
+            }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+            .filters button {
+                padding: 10px 15px;
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+                .filters button:hover {
+                    background-color: #0056b3;
+                }
+
+                .filters button.active {
+                    background-color: #28a745;
+                }
+
+        /* Progress Bars */
+        .progress {
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 8px;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+        }
+
+            .progress-bar.success {
+                background-color: #28a745;
+            }
+
+            .progress-bar.danger {
+                background-color: #dc3545;
+            }
+
+            .progress-bar.info {
+                background-color: #007bff;
+            }
+
+            .progress-bar.warning {
+                background-color: #ffc107;
+            }
+
+        /* Charts */
+        .chart-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            flex: 1;
+            min-width: 300px;
+            height: 300px; /* Fixed height for charts */
+            overflow: hidden; /* Prevent overflow */
+        }
+
+        canvas {
+            max-width: 100%;
+            height: 100% !important; /* Ensure canvas fits within container */
+        }
+
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .chart-container {
+                height: 250px; /* Slightly shorter on mobile */
+            }
+        }
+    </style>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Dashboard</h1>
+
+        <!-- Filters -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="day">Today</button>
+            <button class="filter-btn" data-filter="month">This Month</button>
+            <button class="filter-btn" data-filter="year">This Year</button>
+        </div>
+
+        <!-- KPI Widgets -->
+        <div class="row">
+            <div class="widget success">
+                <h3>Total Incoming Cases</h3>
+                <div class="value" id="incoming-cases">0</div>
+                <div class="description">Filtered by <span id="filter-type">Today</span></div>
+            </div>
+            <div class="widget info">
+                <h3>In Lab Cases</h3>
+                <div class="value" id="in-lab-cases">0</div>
+                <div class="description">Cases currently in lab</div>
+            </div>
+            <div class="widget danger">
+                <h3>Pending Outsource</h3>
+                <div class="value" id="pending-outsource">0</div>
+                <div class="description">Pending for milling</div>
+            </div>
+            <div class="widget warning">
+                <h3>Remake Count</h3>
+                <div class="value" id="remake-count">0</div>
+                <div class="description">Total remakes</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="widget success">
+                <h3>Remake %</h3>
+                <div class="value" id="remake-percentage">0%</div>
+                <div class="description">Last Quarter</div>
+                <div class="progress">
+                    <div class="progress-bar success" id="remake-progress" style="width: 0%;"></div>
+                </div>
+            </div>
+            <div class="widget info">
+                <h3>Adjustments</h3>
+                <div class="value" id="adjustments">0</div>
+                <div class="description">Total adjustments required</div>
+            </div>
+            <div class="widget warning">
+                <h3>Total Sales (Week)</h3>
+                <div class="value" id="total-sales">$0</div>
+                <div class="description">Weekly performance</div>
+            </div>
+            <div class="widget danger">
+                <h3>Pending Design</h3>
+                <div class="value" id="pending-design">0</div>
+                <div class="description">Awaiting designer action</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="row">
+            <div class="chart-container">
+                <h3>Sales Trend</h3>
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Case Types</h3>
+                <canvas id="casePieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Call Center Performance</h3>
+                <canvas id="callChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Additional Widgets -->
+        <div class="row">
+            <div class="widget success">
+                <h3>New Accounts</h3>
+                <div class="value" id="new-accounts">0</div>
+                <div class="description">New accounts created</div>
+            </div>
+            <div class="widget info">
+                <h3>Outbound Calls</h3>
+                <div class="value" id="outbound-calls">0</div>
+                <div class="description">Outbound calls made</div>
+            </div>
+            <div class="widget danger">
+                <h3>Call Hold Time</h3>
+                <div class="value" id="call-hold-time">0s</div>
+                <div class="description">Average call hold time</div>
+            </div>
+            <div class="widget warning">
+                <h3>Customer Satisfaction</h3>
+                <div class="value" id="customer-satisfaction">0%</div>
+                <div class="description">Customer satisfaction rate</div>
+            </div>
+        </div>
+
+        <!-- Additional Pie Charts -->
+        <div class="row">
+            <div class="chart-container">
+                <h3>Case Status</h3>
+                <canvas id="caseStatusPieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Call Types</h3>
+                <canvas id="callTypesPieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Customer Feedback</h3>
+                <canvas id="feedbackPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial data (mocked)
+        const data = {
+            day: {
+                incomingCases: 50,
+                inLabCases: 25,
+                pendingOutsource: 10,
+                remakeCount: 5,
+                remakePercentage: 10,
+                adjustments: 8,
+                totalSales: 2000,
+                pendingDesign: 15,
+                salesTrend: [300, 400, 350, 500, 480, 520, 600],
+                caseTypes: { crowns: 30, bridges: 20, implants: 10, others: 40 },
+                callPerformance: { inbound: 120, outbound: 80, hold: 15 },
+                newAccounts: 5,
+                outboundCalls: 45,
+                callHoldTime: 12,
+                customerSatisfaction: 85,
+                caseStatus: { completed: 60, inProgress: 30, pending: 10 },
+                callTypes: { support: 50, sales: 30, complaints: 20 },
+                feedback: { positive: 70, neutral: 20, negative: 10 },
+            },
+            month: {
+                incomingCases: 500,
+                inLabCases: 250,
+                pendingOutsource: 100,
+                remakeCount: 50,
+                remakePercentage: 12,
+                adjustments: 80,
+                totalSales: 15000,
+                pendingDesign: 120,
+                salesTrend: [3000, 4000, 3500, 5000, 4800, 5200, 6000],
+                caseTypes: { crowns: 300, bridges: 200, implants: 100, others: 400 },
+                callPerformance: { inbound: 1500, outbound: 1000, hold: 200 },
+                newAccounts: 50,
+                outboundCalls: 450,
+                callHoldTime: 15,
+                customerSatisfaction: 88,
+                caseStatus: { completed: 600, inProgress: 300, pending: 100 },
+                callTypes: { support: 500, sales: 300, complaints: 200 },
+                feedback: { positive: 700, neutral: 200, negative: 100 },
+            },
+            year: {
+                incomingCases: 6000,
+                inLabCases: 3000,
+                pendingOutsource: 1200,
+                remakeCount: 400,
+                remakePercentage: 14,
+                adjustments: 950,
+                totalSales: 180000,
+                pendingDesign: 1400,
+                salesTrend: [30000, 40000, 35000, 50000, 48000, 52000, 60000],
+                caseTypes: { crowns: 3600, bridges: 2400, implants: 1200, others: 4800 },
+                callPerformance: { inbound: 18000, outbound: 12000, hold: 2400 },
+                newAccounts: 600,
+                outboundCalls: 5400,
+                callHoldTime: 18,
+                customerSatisfaction: 90,
+                caseStatus: { completed: 7200, inProgress: 3600, pending: 1200 },
+                callTypes: { support: 6000, sales: 3600, complaints: 2400 },
+                feedback: { positive: 8400, neutral: 2400, negative: 1200 },
+            },
+        };
+
+        // Initialize charts
+        const salesChartCtx = document.getElementById("salesChart").getContext("2d");
+        const salesChart = new Chart(salesChartCtx, {
+            type: "line",
+            data: {
+                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                datasets: [
+                    {
+                        label: "Sales ($)",
+                        data: data.day.salesTrend,
+                        borderColor: "#007bff",
+                        backgroundColor: "rgba(0, 123, 255, 0.2)",
+                        fill: true,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+        });
+
+        const casePieChartCtx = document.getElementById("casePieChart").getContext("2d");
+        const casePieChart = new Chart(casePieChartCtx, {
+            type: "pie",
+            data: {
+                labels: ["Crowns", "Bridges", "Implants", "Others"],
+                datasets: [
+                    {
+                        label: "Cases",
+                        data: [
+                            data.day.caseTypes.crowns,
+                            data.day.caseTypes.bridges,
+                            data.day.caseTypes.implants,
+                            data.day.caseTypes.others,
+                        ],
+                        backgroundColor: ["#007bff", "#28a745", "#dc3545", "#ffc107"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+        });
+
+        const callChartCtx = document.getElementById("callChart").getContext("2d");
+        const callChart = new Chart(callChartCtx, {
+            type: "bar",
+            data: {
+                labels: ["Inbound", "Outbound", "Hold"],
+                datasets: [
+                    {
+                        label: "Calls",
+                        data: [
+                            data.day.callPerformance.inbound,
+                            data.day.callPerformance.outbound,
+                            data.day.callPerformance.hold,
+                        ],
+                        backgroundColor: ["#007bff", "#28a745", "#dc3545"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+        });
+
+        // Additional Pie Charts
+        const caseStatusPieChartCtx = document.getElementById("caseStatusPieChart").getContext("2d");
+        const caseStatusPieChart = new Chart(caseStatusPieChartCtx, {
+            type: "pie",
+            data: {
+                labels: ["Completed", "In Progress", "Pending"],
+                datasets: [
+                    {
+                        label: "Cases",
+                        data: [
+                            data.day.caseStatus.completed,
+                            data.day.caseStatus.inProgress,
+                            data.day.caseStatus.pending,
+                        ],
+                        backgroundColor: ["#28a745", "#007bff", "#ffc107"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+        });
+
+        const callTypesPieChartCtx = document.getElementById("callTypesPieChart").getContext("2d");
+        const callTypesPieChart = new Chart(callTypesPieChartCtx, {
+            type: "pie",
+            data: {
+                labels: ["Support", "Sales", "Complaints"],
+                datasets: [
+                    {
+                        label: "Calls",
+                        data: [
+                            data.day.callTypes.support,
+                            data.day.callTypes.sales,
+                            data.day.callTypes.complaints,
+                        ],
+                        backgroundColor: ["#007bff", "#28a745", "#dc3545"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+        });
+
+        const feedbackPieChartCtx = document.getElementById("feedbackPieChart").getContext("2d");
+        const feedbackPieChart = new Chart(feedbackPieChartCtx, {
+            type: "pie",
+            data: {
+                labels: ["Positive", "Neutral", "Negative"],
+                datasets: [
+                    {
+                        label: "Feedback",
+                        data: [
+                            data.day.feedback.positive,
+                            data.day.feedback.neutral,
+                            data.day.feedback.negative,
+                        ],
+                        backgroundColor: ["#28a745", "#ffc107", "#dc3545"],
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+        });
+
+        // Populate widgets with data
+        function updateDashboard(filterType) {
+            const currentData = data[filterType];
+
+            document.getElementById("incoming-cases").textContent = currentData.incomingCases;
+            document.getElementById("in-lab-cases").textContent = currentData.inLabCases;
+            document.getElementById("pending-outsource").textContent = currentData.pendingOutsource;
+            document.getElementById("remake-count").textContent = currentData.remakeCount;
+            document.getElementById("remake-percentage").textContent = `${currentData.remakePercentage}%`;
+            document.getElementById("remake-progress").style.width = `${currentData.remakePercentage}%`;
+            document.getElementById("adjustments").textContent = currentData.adjustments;
+            document.getElementById("total-sales").textContent = `$${currentData.totalSales.toLocaleString()}`;
+            document.getElementById("pending-design").textContent = currentData.pendingDesign;
+            document.getElementById("new-accounts").textContent = currentData.newAccounts;
+            document.getElementById("outbound-calls").textContent = currentData.outboundCalls;
+            document.getElementById("call-hold-time").textContent = `${currentData.callHoldTime}s`;
+            document.getElementById("customer-satisfaction").textContent = `${currentData.customerSatisfaction}%`;
+            document.getElementById("filter-type").textContent = filterType === "day" ? "Today" : filterType === "month" ? "This Month" : "This Year";
+
+            // Update charts
+            salesChart.data.datasets[0].data = currentData.salesTrend;
+            salesChart.update();
+
+            casePieChart.data.datasets[0].data = [
+                currentData.caseTypes.crowns,
+                currentData.caseTypes.bridges,
+                currentData.caseTypes.implants,
+                currentData.caseTypes.others,
+            ];
+            casePieChart.update();
+
+            callChart.data.datasets[0].data = [
+                currentData.callPerformance.inbound,
+                currentData.callPerformance.outbound,
+                currentData.callPerformance.hold,
+            ];
+            callChart.update();
+
+            caseStatusPieChart.data.datasets[0].data = [
+                currentData.caseStatus.completed,
+                currentData.caseStatus.inProgress,
+                currentData.caseStatus.pending,
+            ];
+            caseStatusPieChart.update();
+
+            callTypesPieChart.data.datasets[0].data = [
+                currentData.callTypes.support,
+                currentData.callTypes.sales,
+                currentData.callTypes.complaints,
+            ];
+            callTypesPieChart.update();
+
+            feedbackPieChart.data.datasets[0].data = [
+                currentData.feedback.positive,
+                currentData.feedback.neutral,
+                currentData.feedback.negative,
+            ];
+            feedbackPieChart.update();
+        }
+
+        // Handle filter button clicks
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        filterButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                filterButtons.forEach((b) => b.classList.remove("active"));
+                btn.classList.add("active");
+                updateDashboard(btn.dataset.filter);
+            });
+        });
+
+        // Initialize dashboard with today's data
+        updateDashboard("day");
+    </script>
+</body>
+</html>
+
+{% endblock %}
