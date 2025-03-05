@@ -30,6 +30,17 @@ To start the development server:
 ```sh
 python manage.py runserver
 ```
+## 🚀 We Need Contributors!
+LinksHub is an open-source project, and we need **your help** to make it even better!  
+If you're a developer, designer, or tester, you can contribute by adding features, fixing bugs, improving documentation, or sharing ideas.
+
+### How to Contribute:
+1. Check our **Issues** tab for open tasks.
+2. Fork the repository and start working on a feature or fix.
+3. Submit a Pull Request (PR) and tag us!
+
+🔗 **Join Our Discord/Forum:** [coming soon]  
+💬 **Reach Out on GitHub Discussions**  
 
 ## Contributing
 Contributions are welcome! Please follow these steps:
