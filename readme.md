@@ -9,6 +9,11 @@
 - Scanner & Imaging Integration (Planned)
 - Cloud & On-Premise Support
 
+## Open Source & Premium Model
+LinksHub follows a dual-license model:
+- **Community Edition (Open Source - MIT License)**: Free for everyone, includes basic features.
+- **Pro Edition (Commercial License)**: Includes advanced features and integrations for professionals.
+
 ## Installation
 Clone the repository:
 ```sh
@@ -43,5 +48,21 @@ Contributions are welcome! Please follow these steps:
    ```
 5. Submit a Pull Request
 
+### Contribution Rules
+- All free features go into `/opensource` (MIT License).
+- Premium features in `/premium` are not open-source.
+- Do not submit premium feature code unless discussed.
+- All contributions remain under MIT for the open-source part.
+
+## Monetization & Premium Access
+- Free users get access to the **Community Edition** with essential features.
+- Paid users can access **Premium Features** via a commercial license.
+- Support the project via [GitHub Sponsors](https://github.com/sponsors/yourusername)\
+
 ## License
-This project is licensed under the [MIT License](LICENSE).
+- **Community Edition**: [MIT License](LICENSE)
+- **Pro Edition**: Proprietary License (see `LICENSE_PRO` for details)
+
+## Copyright & Ownership
+© 2025 Links Technologies. All rights reserved.  
+This project is owned by **Links Technologies LLC**. Any unauthorized use, distribution, or modification is strictly prohibited and will be prosecuted.
