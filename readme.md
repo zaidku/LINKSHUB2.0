@@ -17,7 +17,7 @@ LinksHub follows a dual-license model:
 ## Installation
 Clone the repository:
 ```sh
-git clone https://github.com/yourusername/linkshub.git
+git clone https://github.com/zaidku/LINKSHUB2.0.git
 ```
 
 Navigate into the project directory:
